@@ -1,0 +1,92 @@
+---
+title: "Predicion Assignment Writeup"
+author: "rcmantovani"
+--
+
+
+## Background Info
+
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively. In this project, the goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. Individuals were asked to perform barbell lifts correctly and incorrectly in 5 different ways. For more information on the project see HAR website ^[Human Activity recognition Research - PUC RJ ([here](http://groupware.les.inf.puc-rio.br/har))].
+
+## Preparing R environment
+
+```{r message=FALSE}
+rm(list=ls())
+library(caret,quietly=TRUE)
+library(ggplot2,quietly=TRUE)
+library(lattice,quietly=TRUE)
+library(randomForest,quietly=TRUE)
+```
+
+## Data Sources and Preliminary Exploration
+
+The training^[Training data ([ here](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv))] and the testing^[Testing data ([ here](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv))] data sources were downloaded according to Coursera instructions. Both CSV files were placed in a local folder and then loaded from there. 
+
+### Loading data:
+
+```{r loadingdata}
+trainingRaw=read.csv("c:/classes/coursera/predmachlearn-010/assignment/pml-training.csv")
+testingRaw=read.csv("c:/classes/coursera/predmachlearn-010/assignment/pml-testing.csv") 
+summary(trainingRaw[,c(1:2,159:160)])
+dim(trainingRaw)
+dim(testingRaw)
+```
+
+## Data Preparation
+
+### Loading and cleaning training data 
+
+The dataset has several variables. Most of them have invalid values or are irrelevant to our work. Let´s try to keep the dataset as clean and small as possible.  
+```{r preparingdata}
+training=trainingRaw[,-(1:7)] 
+nzv=nearZeroVar(training) 
+training=training[,-nzv] 
+training=training[,colSums(is.na(training)) == 0] 
+dim(training)
+```
+
+The dataset training has hundreds of observations, but the testing set has only 20. The model validation needs to be precise to guarantee viable results. We can partition the training dataset creating a validation set, but we will use another approach that is a k-fold cross validation feature inside the model fitting. In addition, according to Breiman, when using random forest there is no need for a separate testset^[Random Forests - Leo Breiman and Adele Cutler ([here](https://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm#ooberr))]. Morevoer, according to some preliminary experiments with rf model, using a subset of the training set to validate the model will imply in a accuracy of 1.   
+
+## Fitting a model
+
+### Using RandomForest 
+
+An initial intent to use classification trees (caret/rpart) was done to evaluate a preliminary approach. However, the initial results were not good enough. The option for RandomForest showed better results with equivalent computational effort. 
+To build the model we will use the caret package with rf (randomforest) method. We will also use the k-fold cross validation method (trainControl). 
+
+```{r aproach1RandomForestCaret}
+set.seed(125)
+train_control = trainControl(method="cv", number=10)
+modFit=train(training$classe ~., method="rf", data=training,
+             tuneLength = 5, ntree = 25,trControl=train_control)
+```
+
+Below we find the most influential predictors.
+
+```{r aproach1RandomForestCaret2}
+varImp(modFit)
+```
+
+We can see from the confusion matrix and the plots below that the results are quite satisfactory. The out of bag error estimate is 0.76%. The accuracy is 0.99. 
+
+```{r plots, fig.show='hold'}
+print(modFit$finalModel)
+plot(modFit)
+plot(modFit$finalModel)
+```
+
+We finally move to evaluate the model using the testing dataset provided separately. 
+
+```{r testingvalidation}
+predictTesting=predict(modFit,newdata=testingRaw)
+```
+
+## Final Result
+
+By applying the model to the testing set we achieve the following **results**.
+
+```{r results}
+print(predictTesting)
+```
+
+## Footnotes 
