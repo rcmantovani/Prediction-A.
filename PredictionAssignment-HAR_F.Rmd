@@ -1,8 +1,10 @@
 ---
-title: "Predicion Assignment Writeup"
-author: "rcmantovani"
---
+title: "Prediction Assignment Writeup"
+author: "rcmantovani" 
+date: "`r Sys.Date()` V1.0" 
+output: html_document
 
+---
 
 ## Background Info
 
@@ -52,7 +54,7 @@ The dataset training has hundreds of observations, but the testing set has only 
 ### Using RandomForest 
 
 An initial intent to use classification trees (caret/rpart) was done to evaluate a preliminary approach. However, the initial results were not good enough. The option for RandomForest showed better results with equivalent computational effort. 
-To build the model we will use the caret package with rf (randomforest) method. We will also use the k-fold cross validation method (trainControl). 
+To build the model we will use the caret package with rf (randomforest) method. We will also use the k-fold cross validation method (trainControl). Additional parameters include the number of trees to be created and tunelength (number of levels for each tuning parameter). 
 
 ```{r aproach1RandomForestCaret}
 set.seed(125)
