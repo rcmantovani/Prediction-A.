@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="author" content="rcmantovani" />
+
+
+<title>Prediction Assignment Writeup</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; }
+code > span.dt { color: #902000; }
+code > span.dv { color: #40a070; }
+code > span.bn { color: #40a070; }
+code > span.fl { color: #40a070; }
+code > span.ch { color: #4070a0; }
+code > span.st { color: #4070a0; }
+code > span.co { color: #60a0b0; font-style: italic; }
+code > span.ot { color: #007020; }
+code > span.al { color: #ff0000; font-weight: bold; }
+code > span.fu { color: #06287e; }
+code > span.er { color: #ff0000; font-weight: bold; }
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<link href="data:text/css,body%20%7B%0A%20%20background%2Dcolor%3A%20%23fff%3B%0A%20%20margin%3A%201em%20auto%3B%0A%20%20max%2Dwidth%3A%20700px%3B%0A%20%20overflow%3A%20visible%3B%0A%20%20padding%2Dleft%3A%202em%3B%0A%20%20padding%2Dright%3A%202em%3B%0A%20%20font%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0A%20%20font%2Dsize%3A%2014px%3B%0A%20%20line%2Dheight%3A%201%2E35%3B%0A%7D%0A%0A%23header%20%7B%0A%20%20text%2Dalign%3A%20center%3B%0A%7D%0A%0A%23TOC%20%7B%0A%20%20clear%3A%20both%3B%0A%20%20margin%3A%200%200%2010px%2010px%3B%0A%20%20padding%3A%204px%3B%0A%20%20width%3A%20400px%3B%0A%20%20border%3A%201px%20solid%20%23CCCCCC%3B%0A%20%20border%2Dradius%3A%205px%3B%0A%0A%20%20background%2Dcolor%3A%20%23f6f6f6%3B%0A%20%20font%2Dsize%3A%2013px%3B%0A%20%20line%2Dheight%3A%201%2E3%3B%0A%7D%0A%20%20%23TOC%20%2Etoctitle%20%7B%0A%20%20%20%20font%2Dweight%3A%20bold%3B%0A%20%20%20%20font%2Dsize%3A%2015px%3B%0A%20%20%20%20margin%2Dleft%3A%205px%3B%0A%20%20%7D%0A%0A%20%20%23TOC%20ul%20%7B%0A%20%20%20%20padding%2Dleft%3A%2040px%3B%0A%20%20%20%20margin%2Dleft%3A%20%2D1%2E5em%3B%0A%20%20%20%20margin%2Dtop%3A%205px%3B%0A%20%20%20%20margin%2Dbottom%3A%205px%3B%0A%20%20%7D%0A%20%20%23TOC%20ul%20ul%20%7B%0A%20%20%20%20margin%2Dleft%3A%20%2D2em%3B%0A%20%20%7D%0A%20%20%23TOC%20li%20%7B%0A%20%20%20%20line%2Dheight%3A%2016px%3B%0A%20%20%7D%0A%0Atable%20%7B%0A%20%20margin%3A%201em%20auto%3B%0A%20%20border%2Dwidth%3A%201px%3B%0A%20%20border%2Dcolor%3A%20%23DDDDDD%3B%0A%20%20border%2Dstyle%3A%20outset%3B%0A%20%20border%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0A%20%20border%2Dwidth%3A%202px%3B%0A%20%20padding%3A%205px%3B%0A%20%20border%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0A%20%20border%2Dwidth%3A%201px%3B%0A%20%20border%2Dstyle%3A%20inset%3B%0A%20%20line%2Dheight%3A%2018px%3B%0A%20%20padding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0A%20%20border%2Dleft%2Dstyle%3A%20none%3B%0A%20%20border%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0A%0Ap%20%7B%0A%20%20margin%3A%200%2E5em%200%3B%0A%7D%0A%0Ablockquote%20%7B%0A%20%20background%2Dcolor%3A%20%23f6f6f6%3B%0A%20%20padding%3A%200%2E25em%200%2E75em%3B%0A%7D%0A%0Ahr%20%7B%0A%20%20border%2Dstyle%3A%20solid%3B%0A%20%20border%3A%20none%3B%0A%20%20border%2Dtop%3A%201px%20solid%20%23777%3B%0A%20%20margin%3A%2028px%200%3B%0A%7D%0A%0Adl%20%7B%0A%20%20margin%2Dleft%3A%200%3B%0A%7D%0A%20%20dl%20dd%20%7B%0A%20%20%20%20margin%2Dbottom%3A%2013px%3B%0A%20%20%20%20margin%2Dleft%3A%2013px%3B%0A%20%20%7D%0A%20%20dl%20dt%20%7B%0A%20%20%20%20font%2Dweight%3A%20bold%3B%0A%20%20%7D%0A%0Aul%20%7B%0A%20%20margin%2Dtop%3A%200%3B%0A%7D%0A%20%20ul%20li%20%7B%0A%20%20%20%20list%2Dstyle%3A%20circle%20outside%3B%0A%20%20%7D%0A%20%20ul%20ul%20%7B%0A%20%20%20%20margin%2Dbottom%3A%200%3B%0A%20%20%7D%0A%0Apre%2C%20code%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20color%3A%20%23333%3B%0A%7D%0Apre%20%7B%0A%20%20white%2Dspace%3A%20pre%2Dwrap%3B%20%20%20%20%2F%2A%20Wrap%20long%20lines%20%2A%2F%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20margin%3A%205px%200px%2010px%200px%3B%0A%20%20padding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0A%0Acode%20%7B%0A%20%20font%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0A%20%20font%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0A%20%20padding%3A%202px%200px%3B%0A%7D%0A%0Adiv%2Efigure%20%7B%0A%20%20text%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0A%20%20background%2Dcolor%3A%20%23FFFFFF%3B%0A%20%20padding%3A%202px%3B%0A%20%20border%3A%201px%20solid%20%23DDDDDD%3B%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20border%3A%201px%20solid%20%23CCCCCC%3B%0A%20%20margin%3A%200%205px%3B%0A%7D%0A%0Ah1%20%7B%0A%20%20margin%2Dtop%3A%200%3B%0A%20%20font%2Dsize%3A%2035px%3B%0A%20%20line%2Dheight%3A%2040px%3B%0A%7D%0A%0Ah2%20%7B%0A%20%20border%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0A%20%20padding%2Dtop%3A%2010px%3B%0A%20%20padding%2Dbottom%3A%202px%3B%0A%20%20font%2Dsize%3A%20145%25%3B%0A%7D%0A%0Ah3%20%7B%0A%20%20border%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0A%20%20padding%2Dtop%3A%2010px%3B%0A%20%20font%2Dsize%3A%20120%25%3B%0A%7D%0A%0Ah4%20%7B%0A%20%20border%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0A%20%20margin%2Dleft%3A%208px%3B%0A%20%20font%2Dsize%3A%20105%25%3B%0A%7D%0A%0Ah5%2C%20h6%20%7B%0A%20%20border%2Dbottom%3A%201px%20solid%20%23ccc%3B%0A%20%20font%2Dsize%3A%20105%25%3B%0A%7D%0A%0Aa%20%7B%0A%20%20color%3A%20%230033dd%3B%0A%20%20text%2Ddecoration%3A%20none%3B%0A%7D%0A%20%20a%3Ahover%20%7B%0A%20%20%20%20color%3A%20%236666ff%3B%20%7D%0A%20%20a%3Avisited%20%7B%0A%20%20%20%20color%3A%20%23800080%3B%20%7D%0A%20%20a%3Avisited%3Ahover%20%7B%0A%20%20%20%20color%3A%20%23BB00BB%3B%20%7D%0A%20%20a%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0A%20%20%20%20text%2Ddecoration%3A%20underline%3B%20%7D%0A%20%20a%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0A%20%20%20%20text%2Ddecoration%3A%20underline%3B%20%7D%0A%0A%2F%2A%20Class%20described%20in%20https%3A%2F%2Fbenjeffrey%2Ecom%2Fposts%2Fpandoc%2Dsyntax%2Dhighlighting%2Dcss%0A%20%20%20Colours%20from%20https%3A%2F%2Fgist%2Egithub%2Ecom%2Frobsimmons%2F1172277%20%2A%2F%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20Keyword%20%2A%2F%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%2F%2A%20DataType%20%2A%2F%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%2F%2A%20DecVal%20%28decimal%20values%29%20%2A%2F%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20BaseN%20%2A%2F%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20Float%20%2A%2F%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20Char%20%2A%2F%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20String%20%2A%2F%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%2F%2A%20Comment%20%2A%2F%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%2F%2A%20OtherToken%20%2A%2F%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20AlertToken%20%2A%2F%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20Function%20calls%20%2A%2F%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%2F%2A%20ErrorTok%20%2A%2F%0A%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+<div id="header">
+<h1 class="title">Prediction Assignment Writeup</h1>
+<h4 class="author"><em>rcmantovani</em></h4>
+<h4 class="date"><em>2015-01-22 V1.0</em></h4>
+</div>
+
+
+<div id="background-info" class="section level2">
+<h2>Background Info</h2>
+<p>Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively. In this project, the goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. Individuals were asked to perform barbell lifts correctly and incorrectly in 5 different ways. For more information on the project see footnotes<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>.</p>
+</div>
+<div id="preparing-r-environment" class="section level2">
+<h2>Preparing R environment</h2>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">rm</span>(<span class="dt">list=</span><span class="kw">ls</span>())
+<span class="kw">library</span>(caret,<span class="dt">quietly=</span><span class="ot">TRUE</span>)
+<span class="kw">library</span>(ggplot2,<span class="dt">quietly=</span><span class="ot">TRUE</span>)
+<span class="kw">library</span>(lattice,<span class="dt">quietly=</span><span class="ot">TRUE</span>)
+<span class="kw">library</span>(randomForest,<span class="dt">quietly=</span><span class="ot">TRUE</span>)</code></pre>
+<pre><code>## randomForest 4.6-10
+## Type rfNews() to see new features/changes/bug fixes.</code></pre>
+</div>
+<div id="data-sources-and-preliminary-exploration" class="section level2">
+<h2>Data Sources and Preliminary Exploration</h2>
+<p>The training<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> and the testing<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> data sources were downloaded according to Coursera instructions. Both CSV files were placed in a local folder and then loaded from there.</p>
+<div id="loading-data" class="section level4">
+<h4>Loading data:</h4>
+<pre class="sourceCode r"><code class="sourceCode r">trainingRaw=<span class="kw">read.csv</span>(<span class="st">&quot;c:/classes/coursera/predmachlearn-010/assignment/pml-training.csv&quot;</span>)
+testingRaw=<span class="kw">read.csv</span>(<span class="st">&quot;c:/classes/coursera/predmachlearn-010/assignment/pml-testing.csv&quot;</span>) 
+<span class="kw">summary</span>(trainingRaw[,<span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">2</span>,<span class="dv">159</span>:<span class="dv">160</span>)])</code></pre>
+<pre><code>##        X            user_name    magnet_forearm_z classe  
+##  Min.   :    1   adelmo  :3892   Min.   :-973.0   A:5580  
+##  1st Qu.: 4906   carlitos:3112   1st Qu.: 191.0   B:3797  
+##  Median : 9812   charles :3536   Median : 511.0   C:3422  
+##  Mean   : 9812   eurico  :3070   Mean   : 393.6   D:3216  
+##  3rd Qu.:14717   jeremy  :3402   3rd Qu.: 653.0   E:3607  
+##  Max.   :19622   pedro   :2610   Max.   :1090.0</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dim</span>(trainingRaw)</code></pre>
+<pre><code>## [1] 19622   160</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dim</span>(testingRaw)</code></pre>
+<pre><code>## [1]  20 160</code></pre>
+</div>
+</div>
+<div id="data-preparation" class="section level2">
+<h2>Data Preparation</h2>
+<div id="loading-and-cleaning-training-data" class="section level3">
+<h3>Loading and cleaning training data</h3>
+<p>The dataset has several variables. Most of them have invalid values or are irrelevant to our work. Let´s try to keep the dataset as clean and small as possible.</p>
+<pre class="sourceCode r"><code class="sourceCode r">training=trainingRaw[,-(<span class="dv">1</span>:<span class="dv">7</span>)] 
+nzv=<span class="kw">nearZeroVar</span>(training) 
+training=training[,-nzv] 
+training=training[,<span class="kw">colSums</span>(<span class="kw">is.na</span>(training)) ==<span class="st"> </span><span class="dv">0</span>] 
+<span class="kw">dim</span>(training)</code></pre>
+<pre><code>## [1] 19622    53</code></pre>
+<p>The dataset training has hundreds of observations, but the testing set has only 20. The model validation needs to be precise to guarantee viable results. We can partition the training dataset creating a validation set, but we will use a k-fold cross validation feature inside the model fitting (trainControl). In addition, according to Breiman, when using random forest there is no need for a separate testset<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a>. Morevoer, according to some preliminary experiments with rf model, using a subset of the training set to validate the model will imply in a accuracy of 1.</p>
+</div>
+</div>
+<div id="fitting-a-model" class="section level2">
+<h2>Fitting a model</h2>
+<div id="using-randomforest" class="section level3">
+<h3>Using RandomForest</h3>
+<p>An initial intent to use classification trees (caret/rpart) was done to evaluate a preliminary approach. However, the initial results were not good enough. The option for RandomForest showed better results with equivalent computational effort. To build the model we will use the caret package with rf (randomforest) method. We will also use the k-fold cross validation method (trainControl).</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">125</span>)
+train_control =<span class="st"> </span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;cv&quot;</span>, <span class="dt">number=</span><span class="dv">10</span>)
+modFit=<span class="kw">train</span>(training$classe ~., <span class="dt">method=</span><span class="st">&quot;rf&quot;</span>, <span class="dt">data=</span>training,
+             <span class="dt">tuneLength =</span> <span class="dv">5</span>, <span class="dt">ntree =</span> <span class="dv">25</span>,<span class="dt">trControl=</span>train_control)</code></pre>
+<p>Below the find the most influential predictors.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">varImp</span>(modFit)</code></pre>
+<pre><code>## rf variable importance
+## 
+##   only 20 most important variables shown (out of 52)
+## 
+##                      Overall
+## roll_belt             100.00
+## yaw_belt               61.95
+## pitch_forearm          54.06
+## pitch_belt             47.91
+## magnet_dumbbell_z      44.39
+## magnet_dumbbell_y      43.63
+## roll_forearm           41.68
+## magnet_dumbbell_x      27.00
+## accel_dumbbell_y       23.83
+## magnet_belt_z          19.36
+## roll_dumbbell          18.63
+## accel_belt_z           16.58
+## magnet_belt_y          16.04
+## accel_dumbbell_z       15.12
+## accel_forearm_x        14.96
+## roll_arm               14.25
+## gyros_belt_z           12.85
+## total_accel_dumbbell   12.71
+## yaw_arm                12.48
+## magnet_forearm_z       11.96</code></pre>
+<p>We can see from the confusion matrix and the plots below that the results are quite satisfactory. The out of bag error estimate is 0.76%. The accuracy is 0.99. The most influencial predictors are listed below.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(modFit$finalModel)</code></pre>
+<pre><code>## 
+## Call:
+##  randomForest(x = x, y = y, ntree = 25, mtry = param$mtry) 
+##                Type of random forest: classification
+##                      Number of trees: 25
+## No. of variables tried at each split: 14
+## 
+##         OOB estimate of  error rate: 0.76%
+## Confusion matrix:
+##      A    B    C    D    E class.error
+## A 5572    5    1    1    1 0.001433692
+## B   21 3751   23    0    2 0.012114827
+## C    1   21 3388   12    0 0.009935710
+## D    1    2   34 3174    5 0.013059701
+## E    0    6    4   10 3587 0.005544774</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(modFit)
+<span class="kw">plot</span>(modFit$finalModel)</code></pre>
+<p><img src="data:image/png;base64,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" /> <img src="data:image/png;base64,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" /></p>
+<p>We finally move to evaluate the model using the testing dataset provided separately.</p>
+<pre class="sourceCode r"><code class="sourceCode r">predictTesting=<span class="kw">predict</span>(modFit,<span class="dt">newdata=</span>testingRaw)</code></pre>
+<p>The results are:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(predictTesting)</code></pre>
+<pre><code>##  [1] B A B A A E D B A A B C B A E E A B B B
+## Levels: A B C D E</code></pre>
+</div>
+</div>
+<div id="footnotes" class="section level2">
+<h2>Footnotes</h2>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Human activity recognition research - PUC RJ (<a href="http://groupware.les.inf.puc-rio.br/har">here</a>)<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>Training data (<a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv">here</a>)<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>Testing data (<a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv">here</a>)<a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p>Random Forests - Leo Breiman and Adele Cutler (<a href="https://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm#ooberr">here</a>)<a href="#fnref4">↩</a></p></li>
+</ol>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
