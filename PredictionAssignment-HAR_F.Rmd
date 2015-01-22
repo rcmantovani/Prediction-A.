@@ -2,18 +2,14 @@
 title: "Prediction Assignment Writeup"
 author: "rcmantovani" 
 date: "`r Sys.Date()` V1.0" 
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Prediction Assignment Writeup}
-  %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
+output: html_document
 
 ---
 ## Background Info
-Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively. In this project, the goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. Individuals were asked to perform barbell lifts correctly and incorrectly in 5 different ways. For more information on the project see footnotes^[Human activity recognition research - PUC RJ ([here](http://groupware.les.inf.puc-rio.br/har))].
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively. In this project, the goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. Individuals were asked to perform barbell lifts correctly and incorrectly in 5 different ways. For more information on the project see HAR website ^[Human Activity recognition Research - PUC RJ ([here](http://groupware.les.inf.puc-rio.br/har))].
 
 ## Preparing R environment
-```{r libraries}
+```{r message=FALSE}
 rm(list=ls())
 library(caret,quietly=TRUE)
 library(ggplot2,quietly=TRUE)
@@ -24,7 +20,7 @@ library(randomForest,quietly=TRUE)
 ## Data Sources and Preliminary Exploration
 The training^[Training data ([ here](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv))] and the testing^[Testing data ([ here](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv))] data sources were downloaded according to Coursera instructions. Both CSV files were placed in a local folder and then loaded from there. 
 
-#### Loading data:
+### Loading data:
 ```{r loadingdata}
 trainingRaw=read.csv("c:/classes/coursera/predmachlearn-010/assignment/pml-training.csv")
 testingRaw=read.csv("c:/classes/coursera/predmachlearn-010/assignment/pml-testing.csv") 
@@ -75,7 +71,8 @@ We finally move to evaluate the model using the testing dataset provided separat
 ```{r testingvalidation}
 predictTesting=predict(modFit,newdata=testingRaw)
 ```
-The results are:
+## Final Result
+By applying the model to the testing set we achieve the following **results**.
 ```{r results}
 print(predictTesting)
 ```
